@@ -3,27 +3,27 @@ import { useSprings } from "react-spring/hooks";
 import { useGesture } from "react-with-gesture";
 
 import Card from "./Card";
-import data from "../data.js";
 
 import "../styles/Deck.css";
 
-const to = i => ({
-  x: 0,
-  y: i * -10,
-  scale: 1,
-  rot: -10 + Math.random() * 20,
-  delay: i * 100
-});
-const from = i => ({ rot: 0, scale: 1.5, y: -1000 });
+function Deck(props) {
+  const to = i => ({
+    x: 0,
+    y: 0,
+    scale: 1,
+    rot: 0,
+    delay: i * 100
+  });
+  
+  const from = i => ({ rot: 0, scale: 1, y: 0 });
 
-const trans = (r, s) =>
-  `perspective(1500px) rotateX(30deg) rotateY(${r /
-    10}deg) rotateZ(${r}deg) scale(${s})`;
+  const trans = (r, s) =>
+    `perspective(1500px) rotateX(30deg) rotateY(${r /
+      10}deg) rotateZ(${r}deg) scale(${s})`;
 
-function Deck() {
   const [gone] = useState(() => new Set());
 
-  const [props, set] = useSprings(data.length, i => ({
+  const [animatedProps, set] = useSprings(props.products.length, i => ({
     ...to(i),
     from: from(i)
   }));
@@ -41,7 +41,10 @@ function Deck() {
 
       const dir = xDir < 0 ? -1 : 1;
 
-      if (!down && trigger) gone.add(index);
+      if (!down && trigger) {
+        dir === -1 ? props.onDislike() : props.onLike()
+        gone.add(index);
+      }
 
       set(i => {
         if (index !== i) return;
@@ -61,20 +64,25 @@ function Deck() {
         };
       });
 
-      if (!down && gone.size === data.length)
-        setTimeout(() => gone.clear() || set(i => to(i)), 600);
+      if (!down && gone.size === props.products.length) {
+        setTimeout(() => {
+          props.onReset()
+          gone.clear() || set(i => to(i))
+        }, 600);
+      }
     }
   );
 
-  return props.map(({ x, y, rot, scale }, i) => (
+  return animatedProps.map(({ x, y, rot, scale }, i) => (
     <Card
+      key={i}
       i={i}
       x={x}
       y={y}
       rot={rot}
       scale={scale}
       trans={trans}
-      data={data}
+      data={props.products}
       bind={bind}
     />
   ));

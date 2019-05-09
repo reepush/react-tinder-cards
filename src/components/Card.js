@@ -1,16 +1,15 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { animated, interpolate } from "react-spring/hooks";
-import Carousel from "nuka-carousel";
 
 class Card extends React.Component {
   render() {
     const { i, x, y, rot, scale, trans, bind, data } = this.props;
-    const { name, age, distance, text, pics } = data[i];
+    const { imageUrl, name, brand } = data[i];
 
     return (
       <animated.div
-        key={i}
+        key={this.props.uniqueKey}
         style={{
           transform: interpolate(
             [x, y],
@@ -25,15 +24,9 @@ class Card extends React.Component {
           }}
         >
           <div className="card">
-            <Carousel>
-              {pics.map((pic, index) => (
-                <img src={pic} key={index} alt="profilePicture" />
-              ))}
-            </Carousel>
+            <div style={{backgroundImage: `url(${imageUrl})`}}></div>
+            <h5>{brand}</h5>
             <h2>{name},</h2>
-            <h2>{age}</h2>
-            <h5>{distance}</h5>
-            <h5>{text}</h5>
           </div>
         </animated.div>
       </animated.div>
